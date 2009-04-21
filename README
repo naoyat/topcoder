@@ -14,3 +14,9 @@ utils/
   macro.h       - マクロ定義
   pt.scm        - 所要時間と点数の相互変換スクリプト。(Gauche)
 
+cxx/
+  C++ で書いたユーティリティ類
+
+fileedit/
+  SRMのコード
+
