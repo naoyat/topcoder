@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <list>
@@ -9,6 +10,18 @@
 #include <set>
 using namespace std;
 
+string pluralize_if_plural(const string &singular_form, int number)
+{
+  return singular_form + (number >= 2 ? "s" : "");
+}
+string number_with_unit(int number, const string &unit_str)
+{
+  stringstream ss;
+  // ss << number << " " << unit_str << (number >= 2 ? "s" : "");
+  ss << number << " " << pluralize_if_plural(unit_str,number);
+  return ss.str();
+}
+
 ostream& operator<<(ostream &s, vector<string> v)
 {
   int cnt = v.size();
@@ -17,7 +30,7 @@ ostream& operator<<(ostream &s, vector<string> v)
 	if (i > 0) s << ", ";
 	s << '"' << v[i] << '"';
   }
-  return s << " ]  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " ]  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T> ostream& operator<<(ostream &s, vector<T> v)
@@ -28,7 +41,7 @@ template <typename T> ostream& operator<<(ostream &s, vector<T> v)
 	if (i > 0) s << ", ";
 	s << v[i];
   }
-  return s << " ]  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " ]  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T> ostream& operator<<(ostream &s, list<T> ls)
@@ -40,7 +53,7 @@ template <typename T> ostream& operator<<(ostream &s, list<T> ls)
 	s << *it;
 	cnt++;
   }
-  return s << " )  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " )  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T> ostream& operator<<(ostream &s, deque<T> st)
@@ -51,7 +64,7 @@ template <typename T> ostream& operator<<(ostream &s, deque<T> st)
 	if (it != st.begin()) s << ", ";
 	s << *it;
   }
-  return s << " ]  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " ]  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T1, typename T2> ostream& operator<<(ostream &s, map<T1,T2> m)
@@ -62,7 +75,7 @@ template <typename T1, typename T2> ostream& operator<<(ostream &s, map<T1,T2> m
 	if (it != m.begin()) s << ", ";
 	s << it->first << " => " << it->second;
   }
-  return s << " }  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " }  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T> ostream& operator<<(ostream &s, set<T> st)
@@ -73,7 +86,7 @@ template <typename T> ostream& operator<<(ostream &s, set<T> st)
 	if (it != st.begin()) s << ", ";
 	s << *it;
   }
-  return s << " ]  // " << cnt << " item" << (cnt >= 2 ? "s" : "");
+  return s << " ]  // " << number_with_unit(cnt,"item");
 }
 
 template <typename T1, typename T2> ostream& operator<<(ostream &s, pair<T1,T2> p)
