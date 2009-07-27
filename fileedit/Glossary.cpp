@@ -33,29 +33,56 @@ typedef vector<long long> vll;
 #define remove_(c,val) (c).erase(remove((c).begin(),(c).end(),(val)),(c).end())
 #define lastc(str) (*((str).end()-1))
 
-string to_lower(string s)
-{
-  stringstream ss;
-  rep(i,sz(s)) ss << (char)tolower(s[i]);
-  return ss.str();
-}
-string to_upper(string s)
-{
-  stringstream ss;
-  rep(i,sz(s)) ss << (char)toupper(s[i]);
-  return ss.str();
+string lowercase(const string &str){
+  int n=sz(str);
+  char s[20];
+  rep(i,n) s[i]=tolower(str[i]);
+  s[n] = 0;
+  return s;
 }
 
 class Glossary {
  public:
-  vector<string> buildGlossary(vector<string> items) {
-    tr(items,it){
-      string s=*it, s_=to_lower(s);
-      
-      //int ca=s[0];if(ca<='Z')
+  vector <string> buildGlossary(vector <string> items) {
+    int n=sz(items);
+	vector<vector<string> > a_m(2);
+    rep(i,26){
+      int side=i/13;
+      bool f=false;
+      vector<pair<string,string> > is;
+      rep(j,n){
+        int cap=items[j][0]; if (cap>='a') cap-=32;
+        if(cap=='A'+i) { f=true; is.pb(make_pair(lowercase(items[j]),items[j])); }
+      }
+      if (f) {
+        sort(all(is));
+        char buf[20];
+        buf[0]= 'A'+i; for(int k=1;k<19;k++) buf[k]=' '; buf[19]=0;
+        //string s=buf;
+        a_m[side].pb(buf);
+        a_m[side].pb("-------------------");
+        //        cout << ('A'+i) << " " << is << endl;
+        tr(is,it) {
+          sprintf(buf,"  %-17s",it->second.c_str());
+          a_m[side].pb(buf);
+        }
+      }
     }
-	vector<string> atom, ntoz;
-    return atom;
+
+    vector<string> ans;
+    int al=sz(a_m[0]), nl=sz(a_m[1]);
+    // cout << al << " " << nl << endl;
+    for(int i=0;i<al;i++){
+      if(i<nl){
+        ans.pb(a_m[0][i] + "  " + a_m[1][i]);
+      } else {
+        ans.pb(a_m[0][i] + "                     ");
+      }
+    }
+    for(int i=al;i<nl;i++){
+      ans.pb("                     "+a_m[1][i]);
+    }
+    return ans;
   }
 };
 

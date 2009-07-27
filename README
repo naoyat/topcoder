@@ -4,18 +4,20 @@ by naoya_t
 TZTesters/
   cafelier & naoya_t による改良版
 
+lib/
+  C++ で書いたユーティリティ類
+    bignum.h      - 私家版BignumのC++実装
+    bignumtest.cc - 同テスト(要googletest)
+    cout.h        - coutでvectorとかpairとか表示する為の拡張。デバッグ用
+    split.h       - 文字列をsplit
+    lib.h         - その他ライブラリ置き場。
+                    combinations, nCr, GCD/LCM, factorial, 数値の二進数表現, Miller-Rabin法による素数判定など
+    macro.h       - マクロ定義
+    making/
+
 utils/
-  bignum.h      - 私家版BignumのC++実装
-  bignumtest.cc - 同テスト(要googletest)
-  cout.h        - coutでvectorとかpairとか表示する為の拡張。デバッグ用
-  split.h       - 文字列をsplit
-  lib.h         - その他ライブラリ置き場。
-                  combinations, nCr, GCD/LCM, factorial, 数値の二進数表現, Miller-Rabin法による素数判定など
-  macro.h       - マクロ定義
   point.scm     - 所要時間と点数の相互変換スクリプト。(Gauche)
 
-cxx/
-  C++ で書いたユーティリティ類
 
 fileedit/
   SRMのコード

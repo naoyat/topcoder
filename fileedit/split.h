@@ -46,6 +46,15 @@ vector<int> map_atoi(vector<string> nums)
   return vals;
 }
 
+string join(vector<string> strs, const string &delim="")
+{
+  int n=strs.size(); if (n==0) return "";
+  stringstream ss;
+  ss << strs[0];
+  for(int i=1;i<n;i++) { ss << delim << strs[i]; }
+  return ss.str();
+}
+
 /** 文字列をdelimにする版。使ったことない **/
 vector<string> split(string str, string delim)
 {
