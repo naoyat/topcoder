@@ -1,0 +1,119 @@
+#include <string>
+#include <vector>
+#include <set>
+#include <queue>
+#include <algorithm>
+// BEGIN CUT HERE
+#include <iostream>
+#include "cout.h"
+// END CUT HERE
+#include <sstream>
+#include <cmath>
+using namespace std;
+
+#define sz(a)  int((a).size())
+#define pb  push_back
+#define all(c)  (c).begin(),(c).end()
+#define tr(c,i)  for(typeof((c).begin()) i=(c).begin(); i!=(c).end(); i++)
+#define rep(var,n)  for(int var=0;var<(n);var++)
+
+bool greater_by_length(const string& s1, const string& s2 )
+{
+  return s1.length() > s2.length();
+}
+template <typename T> struct better : binary_function<T,T,bool> {
+  bool operator()(const T& X, const T& Y) const{
+    // at, score
+    if (X.first >= Y.first) return X.second < Y.second;
+    return false;
+  }
+};
+
+class SentenceDecomposition {
+private:
+  bool abc[26];
+  bool usable(const string &str) {
+    rep(i,str.length()) if (!abc[str[i]-'a']) return false;
+    return true;
+  }
+
+  string strsort(const string &str) {
+    vector<char> buf(all(str));
+    sort(all(buf));
+    string sorted(all(buf));
+    return sorted;
+  }
+  int score(string orig, string word) {
+    int d = orig.length();
+    for (int i=d-1; i>=0; i--) if (orig[i] == word[i]) d--;
+    return d;
+  }
+public:
+  int decompose(string sentence, vector<string> validWords) {
+    int l=sentence.length();
+
+    rep(i,26) abc[i] = false;
+    rep(i,l) abc[sentence[i]-'a'] = true;
+
+    set<string> s;
+    tr(validWords,wt) if (usable(*wt)) s.insert(*wt);
+
+    vector<string> valids(all(s));
+    sort(all(valids),greater_by_length);
+
+    int n=valids.size();
+    vector<string> words(n);
+    rep(i,n) {
+      words[i] = strsort(valids[i]);
+    }
+    priority_queue<pair<int,int>, vector<pair<int,int> >, better<pair<int,int> > > pq;
+
+    vector<int> said(l+1,INT_MAX);
+
+    rep(i,n) {
+      int wl = words[i].length();
+      if (0+wl <= l) {
+        string ss = sentence.substr(0,wl);
+        if (strsort(ss) == words[i]) {
+          int sc = score(valids[i],ss);
+          if (sc < said[wl]) {
+            pair<int,int> p = make_pair(wl,sc);
+            pq.push(p);
+            said[wl] = sc;
+          }
+        }
+      }
+    }
+
+    int topscore = INT_MAX;
+
+    while (!pq.empty()) {
+      int at = pq.top().first, pt = pq.top().second;
+      pq.pop();
+
+      if (at == l) {
+        topscore = min(topscore,pt);
+        continue;
+      }
+
+      rep(i,n) {
+        int wl = words[i].length();
+        if (at+wl <= l) {
+          string ss = sentence.substr(at,wl);
+          if (strsort(ss) == words[i]) {
+            int newscore = pt+score(valids[i],ss);
+            if (newscore < topscore) {
+              if (newscore < said[at+wl]) {
+                pair<int,int> p = make_pair(at+wl,newscore);
+                pq.push(p);
+                said[at+wl] = newscore;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return (topscore == INT_MAX)? -1 : topscore;
+  }
+};

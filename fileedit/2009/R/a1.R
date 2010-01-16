@@ -1,0 +1,5 @@
+png(file="a1.png")
+par(bg="grey95", mar=c(4,4,1,1), mfrow=c(2,1))
+wave <- read.table("a1.dat", header = TRUE)
+plot(wave$alpha ~ wave$beta, type="l")
+dev.off()

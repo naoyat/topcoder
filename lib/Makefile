@@ -1,8 +1,13 @@
 #all: cppunit cxxtest google boost
 
-bignum: bignumtest.cc bignum.h
-	g++ -o bignumtest -lgtest bignumtest.cc
-	./bignumtest
+isle: isle_test.cc isle.h
+	g++ -o isle_test -lgtest isle_test.cc
+	./isle_test
+
+bignum: bignum_test.cc bignum.h
+	g++ -o bignum_test -lgtest bignum_test.cc
+	./bignum_test
+
 
 #clean:
 #	rm -f *~ runner tests *.o

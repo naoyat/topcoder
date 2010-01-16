@@ -1,0 +1,52 @@
+#include &lt;string>
+#include &lt;vector>
+#include &lt;algorithm>
+using namespace std;
+
+#define all(c)  (c).begin(),(c).end()
+#define tr(c,i)  for(typeof((c).begin()) i=(c).begin(); i!=(c).end(); i++)
+#define rep(var,n)  for(int var=0;var&lt;(n);var++)
+
+class SentenceDecomposition {
+private:
+  string strsort(const string &str) {
+    vector&lt;char> buf(all(str));
+    sort(all(buf));
+    string sorted(all(buf));
+    return sorted;
+  }
+  int score(string orig, string word) {
+    if (strsort(orig) != strsort(word)) return -1;
+    int d = orig.length();
+    for (int i=d-1; i>=0; i--) if (orig[i] == word[i]) d--;
+    return d;
+  }
+public:
+  int len;
+  string sent;
+  vector&lt;string> valids;
+  vector&lt;int> memo;
+
+  int sub(int len) {
+    if (len==0) return 0;
+    if (memo[len] &lt; INT_MAX) return memo[len];
+    int min_score = INT_MAX;
+    tr(valids,it) {
+      int vl = it->length(); if (vl > len) continue;
+      int subsc = sub(len-vl); if (subsc == INT_MAX) continue;
+      int sc = score(*it,sent.substr(len-vl,vl)); if (sc == -1) continue;
+      sc += subsc; if (sc &lt; min_score) min_score = sc;
+    }
+    memo[len] = min(memo[len], min_score);
+    return min_score;
+  }
+
+  int decompose(string sentence, vector&lt;string> validWords) {
+    sent = sentence; len = sentence.length();
+    memo.resize(len+1); fill(all(memo),INT_MAX);
+	valids.assign(all(validWords));
+	//valids = validWords;
+    int topscore = sub(len);
+    return (topscore == INT_MAX)? -1 : topscore;
+  }
+};

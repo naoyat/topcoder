@@ -1,0 +1,101 @@
+#include &lt;string>
+#include &lt;vector>
+#include &lt;set>
+using namespace std;
+
+#define tr(c,i)  for(typeof((c).begin()) i=(c).begin(); i!=(c).end(); i++)
+#define found(s,e)  ((s).find(e)!=(s).end())
+
+#define HOME 0
+#define AWAY 1
+
+class CavePassage {
+public:
+  int minimalTime(vector&lt;int> travelersWeights,
+                  vector&lt;int> travelersTimes,
+                  vector&lt;string> trustTable,
+                  int bridgeStrength) {
+
+    int nn = travelersWeights.size();
+    int patterns = 1 &lt;&lt; nn;
+    int all_mask = patterns - 1;
+    int start = 0, goal = all_mask;
+
+    set&lt;int> possibles;
+    vector&lt;int> weight(patterns, INT_MAX);
+    vector&lt;int> minute(patterns, INT_MAX);
+
+    for (int m=1; m&lt;=all_mask; m++) {
+      int weight_ = 0, minute_ = 0;
+      for (int i=0,mi=1; i&lt;nn; i++,mi&lt;&lt;=1) {
+        if (mi & m) {
+          weight_ += travelersWeights[i];
+          minute_ = max(minute_, travelersTimes[i]);
+        }
+        if (weight_ > bridgeStrength) goto impossible;
+
+        if (__builtin_popcount(m) >= 2) {
+          int trust_count = 0;
+          const char *cs = trustTable[i].c_str();
+          for (int j=0,mj=1; j&lt;nn; j++,mj&lt;&lt;=1) {
+            if (j != i && (mj & m)) {
+              if (cs[j] == 'Y') trust_count++;
+            }
+          }
+          if (trust_count == 0) goto impossible;
+        }
+      }
+      weight[m] = weight_;
+      minute[m] = minute_;
+      possibles.insert(m);
+    impossible:
+      continue;
+    }
+    if (possibles.size() == 0) return -1;
+
+    vector&lt;vector&lt;int> > distance_to_fix(2);
+    vector&lt;vector&lt;int> > distance_fixed(2);
+    for (int i=HOME; i&lt;=AWAY; i++) {
+      distance_to_fix[i].resize(patterns);
+      distance_fixed[i].resize(patterns);
+      for (int j=0; j&lt;=all_mask; j++)
+        distance_to_fix[i][j] = distance_fixed[i][j] = INT_MAX;;
+    }
+
+    distance_fixed[HOME][start] = 0;
+
+    tr(possibles,it) {
+      distance_to_fix[AWAY][*it] = minute[*it];
+    }
+
+    while (1) { // while (distance_fixed[AWAY][goal] == -1) {
+      int distance_min = INT_MAX;
+      for (int j=1; j&lt;=all_mask; j++)
+        for (int i=HOME; i&lt;=AWAY; i++)
+          if (distance_to_fix[i][j] &lt; distance_min) distance_min = distance_to_fix[i][j];
+      if (distance_min == INT_MAX) break;
+
+      for (int j=1; j&lt;=all_mask; j++) {
+        for (int i=HOME; i&lt;=AWAY; i++) {
+          if (distance_to_fix[i][j] == distance_min) {
+            distance_fixed[i][j] = distance_min;
+            distance_to_fix[i][j] = INT_MAX;
+            if (i == AWAY && j == goal) return distance_min;
+
+            tr(possibles,it) {
+              int m = *it;
+              if ((j & m) == (i == HOME ? 0 : m)) {
+                int d = distance_min + minute[m];
+                int at = (i == HOME)? j + m : j - m;
+                if (i == AWAY && (at == start || at == goal)) continue;
+                if (distance_fixed[1-i][at] == INT_MAX)
+                  if (d &lt; distance_to_fix[1-i][at]) distance_to_fix[1-i][at] = d;
+              }
+            }
+          }
+        }
+      }
+    }
+    return -1;
+  }
+};

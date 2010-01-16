@@ -1,0 +1,209 @@
+// BEGIN CUT HERE
+/*
+// PROBLEM STATEMENT
+// You are given an electrical circuit for a home, with a number of nodes possibly connected by wires.  Any pair of nodes may be connected by at most one wire, and a node can't be connected to itself.  Each node on the circuit is either an electrical outlet for the house or a connection to the main electrical grid.  The vector <string> wires tells you the wires that are already in place; the xth character of the yth element is '1' (one) if nodes x and y have a wire between them, '0' (zero) otherwise.  The vector <int> gridConnections lists the indices of the nodes that are connections to the main electrical grid.
+
+You'd like to make the circuit safer and more redundant by adding as many extra wires to it as possible.  The one complication is that no two main grid connections are currently wired together (directly or indirectly), and you must preserve this, or else disaster will result.  Determine the maximum number of new wires you can add to the circuit.
+
+DEFINITION
+Class:AddElectricalWires
+Method:maxNewWires
+Parameters:vector <string>, vector <int>
+Returns:int
+Method signature:int maxNewWires(vector <string> wires, vector <int> gridConnections)
+
+
+CONSTRAINTS
+-wires will contain between 1 and 50 elements, inclusive.
+-Each element of wires will have the same length as wires.
+-Each element of wires will contain only the characters '0' and '1'.
+-Character i of element i of wires will be a '0'.
+-Character i of element j of wires will be the same as character j of element i.
+-gridConnections will contain between 1 and 50 elements, inclusive.
+-Each element of gridConnections will be an integer between 0 and length(wires)-1, inclusive.
+-Each element of gridConnections will be distinct.
+-Each pair of elements of gridConnections will not index nodes connected by a path of '1's in wires.
+
+
+EXAMPLES
+
+0)
+{"000","000","000"}
+{0}
+
+Returns: 3
+
+Every valid wire can be added.
+
+1)
+{"000","000","000"}
+{0,1}
+
+Returns: 1
+
+0 and 1 can't be connected, but 0 and 2 (or 1 and 2) still can be.
+
+2)
+{"01","10"}
+{0}
+
+Returns: 0
+
+This circuit is already complete.
+
+3)
+{"00000","00000","00000","00000","00000"}
+{0,1,2,3,4}
+
+Returns: 0
+
+Any connections would be disastrous.
+
+4)
+{"01000","10100","01010","00100","00000"}
+{2,4}
+
+Returns: 3
+
+
+
+*/
+// END CUT HERE
+
+#line 74 "AddElectricalWires.cpp"
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+#include <list>
+#include <queue>
+#include <algorithm>
+// BEGIN CUT HERE
+#include <iostream>
+#include "cout.h"
+// END CUT HERE
+#include <sstream>
+#include <cmath>
+using namespace std;
+
+#define sz(a)  int((a).size())
+#define pb  push_back
+#define all(c)  (c).begin(),(c).end()
+#define tr(c,i)  for(typeof((c).begin()) i=(c).begin(); i!=(c).end(); i++)
+#define rep(var,n)  for(int var=0;var<(n);var++)
+
+class AddElectricalWires {
+  vector<vector<bool> > w;
+  vector<int> gC;
+  int nw, ngc;
+
+  void turn(int orig,int dest) {
+	rep(i,nw) if (gC[i]==orig) gC[i]=dest;
+  }
+
+  int sub(int n) {
+	if (n == 0) return 0;
+	int c0 = sub(n-1);
+	set<int> s;
+
+	if (gC[n]<0) {
+	  int c1=gC[n];
+	  s.insert(gC[n]);
+	  for (int i=0;i<n;i++) {
+		if (gC[i]<0) { s.insert(gC[i]); c0++; }
+		else if (c1<0) { c1=gC[i]; s.insert(gC[i]); c0++; }
+	  }
+	  //cout << "s: " << s << ", c1: " << c1 << endl;
+	  for (int i=0;i<n;i++) {
+		if (s.find(gC[i])!=s.end()) gC[i] = c1;
+	  }
+	} else {
+	  int c1 = gC[n];
+	  for (int i=0;i<n;i++) {
+		if (gC[i]<0) { gC[i] = c1; c0++; }
+		else if (gC[i]==c1) c0++;
+	  }
+	}
+	return c0;
+  }
+public:
+  int maxNewWires(vector<string> wires, vector<int> gridConnections) {
+	nw = wires.size(); //1-50
+	ngc = gC.size(); // 1-50
+
+	gC.resize(nw); rep(i,nw) gC[i]=-i-1;
+	tr(gridConnections,it) gC[*it]=*it;
+
+	int conn=0;
+	w.resize(nw); tr(w,it) it->resize(nw);
+	rep(i,nw) rep(j,nw) {
+	  w[i][j] = (wires[i][j] == '1');
+	  if (i<j && w[i][j]) {
+		conn++;
+		turn(min(gC[i],gC[j]),max(gC[i],gC[j]));
+	  }
+	}
+	//cout << "gC:" << gC << endl;
+	
+	// gridConnections[] : 0..nw-1
+	return sub(nw-1) - conn;
+  }
+};
+
+// BEGIN CUT HERE
+#include <time.h>
+clock_t start_time;
+void timer_clear() { start_time = clock(); }
+string timer() { clock_t end_time = clock(); double interval = (double)(end_time - start_time)/CLOCKS_PER_SEC; ostringstream os; os << " (" << interval*1000 << " msec)"; return os.str(); }
+
+template <typename T> string print_array(const vector<T> &V) { ostringstream os; os << "{ "; for (typename vector<T>::const_iterator iter = V.begin(); iter != V.end(); ++iter) os << '\"' << *iter << "\","; os << " }"; return os.str(); }
+int verify_case(const int &Expected, const int &Received) { if (Expected == Received) cerr << "PASSED" << timer() << endl; else { cerr << "FAILED" << timer() << endl; cerr << "\tExpected: \"" << Expected << '\"' << endl; cerr << "\tReceived: \"" << Received << '\"' << endl; } return 0;}
+
+template<int N> struct Case_ {};
+char Test_(...);
+int Test_(Case_<0>) {
+	timer_clear();
+	string wires_[] = {"000","000","000"};
+	  vector <string> wires(wires_, wires_+sizeof(wires_)/sizeof(*wires_)); 
+	int gridConnections_[] = {0};
+	  vector <int> gridConnections(gridConnections_, gridConnections_+sizeof(gridConnections_)/sizeof(*gridConnections_)); 
+	int RetVal = 3; 
+	return verify_case(RetVal, AddElectricalWires().maxNewWires(wires, gridConnections)); }
+int Test_(Case_<1>) {
+	timer_clear();
+	string wires_[] = {"000","000","000"};
+	  vector <string> wires(wires_, wires_+sizeof(wires_)/sizeof(*wires_)); 
+	int gridConnections_[] = {0,1};
+	  vector <int> gridConnections(gridConnections_, gridConnections_+sizeof(gridConnections_)/sizeof(*gridConnections_)); 
+	int RetVal = 1; 
+	return verify_case(RetVal, AddElectricalWires().maxNewWires(wires, gridConnections)); }
+int Test_(Case_<2>) {
+	timer_clear();
+	string wires_[] = {"01","10"};
+	  vector <string> wires(wires_, wires_+sizeof(wires_)/sizeof(*wires_)); 
+	int gridConnections_[] = {0};
+	  vector <int> gridConnections(gridConnections_, gridConnections_+sizeof(gridConnections_)/sizeof(*gridConnections_)); 
+	int RetVal = 0; 
+	return verify_case(RetVal, AddElectricalWires().maxNewWires(wires, gridConnections)); }
+int Test_(Case_<3>) {
+	timer_clear();
+	string wires_[] = {"00000","00000","00000","00000","00000"};
+	  vector <string> wires(wires_, wires_+sizeof(wires_)/sizeof(*wires_)); 
+	int gridConnections_[] = {0,1,2,3,4};
+	  vector <int> gridConnections(gridConnections_, gridConnections_+sizeof(gridConnections_)/sizeof(*gridConnections_)); 
+	int RetVal = 0; 
+	return verify_case(RetVal, AddElectricalWires().maxNewWires(wires, gridConnections)); }
+int Test_(Case_<4>) {
+	timer_clear();
+	string wires_[] = {"01000","10100","01010","00100","00000"};
+	  vector <string> wires(wires_, wires_+sizeof(wires_)/sizeof(*wires_)); 
+	int gridConnections_[] = {2,4};
+	  vector <int> gridConnections(gridConnections_, gridConnections_+sizeof(gridConnections_)/sizeof(*gridConnections_)); 
+	int RetVal = 3; 
+	return verify_case(RetVal, AddElectricalWires().maxNewWires(wires, gridConnections)); }
+
+template<int N> void Run_() { cerr << "Test Case #" << N << "..." << flush; Test_(Case_<N>()); Run_<sizeof(Test_(Case_<N+1>()))==1 ? -1 : N+1>(); }
+template<>      void Run_<-1>() {}
+int main() { Run_<0>(); }
+// END CUT HERE
+
