@@ -1,0 +1,10 @@
+#!/bin/sh
+
+awk 'BEGIN {cutmode=0}
+/^\/\/ BEGIN CUT HERE/ { cutmode=1; next }
+/^\/\/ END CUT HERE/ { cutmode=0; next }
+/^#include <time.h>/ { cutmode=0; next } ## for debug
+(cutmode == 0) { print }' $1 > $1.cut.cc
+
+g++ -O2 $1.cut.cc
+
